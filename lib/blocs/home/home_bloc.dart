@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutterband/models/message.dart';
+import 'package:flutterband/uid.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -16,8 +17,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   String voiceCapture;
   Firestore _firestore;
   int channel;
+  Uid uid;
 
-  HomeBloc() {
+  HomeBloc(this.uid) {
     this.onChange.listen((e) {
       if ((e.eventData) == 'spokenword') {
         print('***SPOKEN WORD PROCESSING***');
@@ -48,6 +50,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Stream<HomeState> mapEventToState(
     HomeEvent event,
   ) async* {
+
+
     if (event is ChannelBrowseEvent) {
       yield ChannelBrowseState(event.channel);
     }else
@@ -63,8 +67,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       _firestore = Firestore.instance;
       Message message =
           Message(message: this.voiceCapture, channel: this.channel);
-      await _firestore.collection('message').add(message.toEntity());
-      yield BroadcastSentState(message);
+      String uidValue=await uid.value();
+      await _firestore.collection('message').add(message.toEntity()..putIfAbsent('uid',  () => uidValue));
+      yield BroadcastSentState(message,channel);
     } else if (event is StartIncomingEvent) {
       yield* _mapStartIncomingEventToState(event.message, event.languageCode);
     }
