@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutterband/blocs/home/bloc.dart';
+import 'package:flutterband/uid.dart';
 import './bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterband/models/message.dart';
@@ -9,6 +10,8 @@ import 'package:flutterband/models/message.dart';
 class EarwigBloc extends Bloc<EarwigEvent, EarwigState> {
   StreamSubscription listener;
 
+  Uid uid;
+  EarwigBloc(this.uid);
   @override
   EarwigState get initialState => InitialEarwigState();
   int startAtTimestamp = DateTime.now().millisecondsSinceEpoch;
@@ -37,7 +40,7 @@ class EarwigBloc extends Bloc<EarwigEvent, EarwigState> {
       StartListeningEvent event) async* {
     print("***CONNECTING TO DB***");
     Firestore _firestore = Firestore.instance;
-
+    String uidValue=await uid.value();
     print("***CHANNEL   "+event.channel.toString()+"   CHANNEL***");
     listener = Firestore.instance
         .collection('message')
@@ -49,9 +52,14 @@ class EarwigBloc extends Bloc<EarwigEvent, EarwigState> {
       data.documents
           .where((element) => element['time'] > startAtTimestamp)
           .forEach((element) {
+
         print("***OVER " + startAtTimestamp.toString() + "***");
         print(element.data);
-        this.add(PushMessageEvent(Message.fromEntity(element.data)));
+
+        if(element.data['uid'] != uidValue){
+          this.add(PushMessageEvent(Message.fromEntity(element.data)));
+        }
+
         print("***OVER***");
       });
       startAtTimestamp = DateTime.now().millisecondsSinceEpoch;

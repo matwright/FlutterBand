@@ -21,6 +21,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return BlocBuilder<NavBloc, NavState>(builder: (_, state) {
       return SafeArea(
           child: Scaffold(

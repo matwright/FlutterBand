@@ -5,15 +5,16 @@ import 'package:flutterband/blocs/earwig/bloc.dart';
 import 'package:flutterband/blocs/home/bloc.dart';
 import 'package:flutterband/blocs/nav/bloc.dart';
 import 'package:flutterband/home_screen.dart';
+import 'package:flutterband/uid.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   BlocSupervisor.delegate = MyBlocDelegate();
-
+  Uid uid=new Uid();
   runApp(
     MultiBlocProvider(providers: [
-      BlocProvider(create: (context) => EarwigBloc()),
-      BlocProvider(create: (context) => HomeBloc()),
+      BlocProvider(create: (context) => EarwigBloc(uid)),
+      BlocProvider(create: (context) => HomeBloc(uid)),
     ], child: MyApp()),
   );
 }
@@ -46,21 +47,10 @@ class MyApp extends StatelessWidget {
         ),
         home: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
+
             return BlocProvider(
               create: (context) => NavBloc(),
-              child: MultiBlocProvider(providers: [
-                BlocProvider(create: (context) => EarwigBloc()),
-                BlocProvider(create: (context) => HomeBloc()),
-              ],
-
-
-                  child:
-                  HomeScreen(name: 'home')
-                 ));
-
-
-
-
+              child:    HomeScreen(name: 'home'));
           },
         ));
   }
