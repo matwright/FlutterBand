@@ -48,23 +48,23 @@ _body(NavState state, BuildContext context) {
             },
           ),
         ],
-        child:
-        Scaffold(
+        child: Scaffold(
           body: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("assets/texture.png"),
-                colorFilter: new ColorFilter.mode(Colors.blueAccent.withOpacity(0.9), BlendMode.dstATop),
-
+                colorFilter: new ColorFilter.mode(
+                    Colors.blueAccent.withOpacity(0.9), BlendMode.dstATop),
                 fit: BoxFit.cover,
               ),
             ),
-            child:   BlocConsumer<EarwigBloc, EarwigState>(listener: (context, state) {
+            child: BlocConsumer<EarwigBloc, EarwigState>(
+                listener: (context, state) {
               if (state is MessageReceivedEarwigState) {
                 Locale myLocale = Localizations.localeOf(context);
                 print('YAY++++' + state.message.message + '++++YAY');
-                BlocProvider.of<HomeBloc>(context)
-                    .add(StartIncomingEvent(state.message, myLocale.languageCode));
+                BlocProvider.of<HomeBloc>(context).add(
+                    StartIncomingEvent(state.message, myLocale.languageCode));
               }
             }, builder: (context, state) {
               var size = MediaQuery.of(context).size;
@@ -115,12 +115,13 @@ _body(NavState state, BuildContext context) {
                                   _channel = channel.toInt();
                                   BlocProvider.of<HomeBloc>(context)
                                       .add(ChannelBrowseEvent(_channel));
-                                  if (BlocProvider.of<EarwigBloc>(context).state !=
+                                  if (BlocProvider.of<EarwigBloc>(context)
+                                          .state !=
                                       EardeafState()) {
                                     BlocProvider.of<EarwigBloc>(context)
                                         .add(StopListeningEvent());
-                                    BlocProvider.of<EarwigBloc>(context)
-                                        .add(StartListeningEvent(currentChannel()));
+                                    BlocProvider.of<EarwigBloc>(context).add(
+                                        StartListeningEvent(currentChannel()));
                                   } else {
                                     //Nothing to do
                                   }
@@ -133,12 +134,11 @@ _body(NavState state, BuildContext context) {
                               )
                             ],
                           ))),
-                  ChannelDisplayWidget(),
+                  ChannelDisplayWidget(currentChannel: _channel),
                 ],
               );
-            })/* add child content here */,
+            }) /* add child content here */,
           ),
-        )
-           );
+        ));
   }
 }
